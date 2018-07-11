@@ -5,7 +5,6 @@ from wtforms import Form, StringField, TextAreaField, PasswordField, validators
 from passlib.hash import pbkdf2_sha256
 from functools import wraps
 from jinja2 import Template
-from flask_paginate import Pagination, get_page_parameter
 
 app = Flask(__name__)
 
@@ -33,12 +32,6 @@ def about():
 
 @app.route('/articles')
 def articles():
-    search = False
-    q = request.args.get('q')
-    if q:
-        search = True
-    page = request.args.get(get_page_parameter(), type=int, default=1)
-    pagination = Pagination(page=page, total=articles.count(), search=search, record_name='articles')
     # Create cursor
     cur = mysql.connection.cursor()
 
@@ -48,7 +41,7 @@ def articles():
     articles = cur.fetchall()
 
     if result > 0:
-        return render_template('articles.html', articles = articles, pagination=pagination,)
+        return render_template('articles.html', articles = articles)
     else:
         msg = 'No articles found'
         return render_template('articles.html', msg = msg)
